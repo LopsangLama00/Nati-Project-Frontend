@@ -1,0 +1,120 @@
+.footer {
+  background: #f6f5f4;
+  padding: 60px 0 30px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ---------- TITLES ---------- */
+.footer-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  color: #8b1e0e;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+
+/* ---------- BODY TEXT ---------- */
+.footer-text {
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 500;
+  line-height: 1.6;
+  font-size: 16px;
+  max-width: 260px;
+  text-wrap: balance;
+}
+
+/* ---------- LINKS ---------- */
+.footer-link {
+  color: #8b1e0e;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+
+ 
+}
+
+/* ---------- LIST ---------- */
+.footer-list {
+  list-style: none;
+  padding: 0;
+  display: block;
+}
+
+.footer-list li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.footer-list a {
+  color: #555;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+.footer-list a:hover {
+  color: #8b1e0e;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  font-size: 16px
+
+}
+
+/* ---------- DIVIDER ---------- */
+.footer-divider {
+  margin: 40px 0;
+  opacity: 0.15;
+}
+
+/* ---------- SUBSCRIBE TEXT ---------- */
+.footer-subscribe-text {
+  margin-bottom: 10px;
+  color: #444;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- BUTTON ---------- */
+.footer-btn {
+  background-color: #8b1e0e;
+  border: none;
+  font-weight: 500;
+  padding: 8px 18px;
+}
+
+.footer-btn:hover {
+  background-color: #6e170a;
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: row;   /* make horizontal */
+  gap: 15px;             /* space between icons */
+  align-items: center;
+}
+
+.footer-social a {
+  display: inline-flex;  /* prevents vertical stacking */
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.footer-social a:hover {
+  color: #8b1e0e;
+  transform: translateY(-1px);
+}
+
+/* ---------- COPYRIGHT ---------- */
+.footer-copy {
+  color: #777;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+}
