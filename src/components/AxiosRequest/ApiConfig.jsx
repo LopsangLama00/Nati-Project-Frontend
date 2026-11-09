@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const BASE_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:8000";
+  "http://127.0.0.1:8000";
 
 export const API_CONFIG = {
   BASE_URL,
