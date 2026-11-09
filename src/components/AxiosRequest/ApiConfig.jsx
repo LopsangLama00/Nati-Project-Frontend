@@ -4,14 +4,23 @@ import { toast } from "react-toastify";
 // ============================================================
 // 1. Configuration
 // ============================================================
+// ============================================================
+// 1. Configuration
+// ============================================================
+
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8000";
 
 export const API_CONFIG = {
-  BASE_URL:
-    import.meta.env.VITE_API_URL,
+  BASE_URL,
 
   API_PREFIX: "/api",
+
   TIMEOUT: 30000,
+
   MAX_RETRIES: 3,
+
   RETRY_DELAY: 1000,
 };
 
@@ -29,7 +38,11 @@ const api = axios.create({
     Accept: "application/json",
   },
 });
+console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
 
+console.log("API BASE URL:", API_CONFIG.BASE_URL);
+
+console.log("Final API URL:", api.defaults.baseURL);
 // ============================================================
 // 3. CSRF utilities
 // ============================================================
@@ -47,66 +60,85 @@ export const getCookie = (name) => {
 };
 
 // Prevent multiple simultaneous CSRF initialization requests.
+
+
+// ============================================================
+// 3. CSRF utilities
+// ============================================================
+
+let csrfToken = null;
 let csrfPromise = null;
 
-export const ensureCsrfCookie = async () => {
-  if (getCookie("csrftoken")) {
-    return getCookie("csrftoken");
-  }
+const SAFE_METHODS = ["get", "head", "options", "trace"];
 
-  if (!csrfPromise) {
-    csrfPromise = api
-      .get("/csrf/")
-      .then(() => {
-        const token = getCookie("csrftoken");
+export const ensureCsrfCookie = async (force = false) => {
+    if (csrfToken && !force) {
+        return csrfToken;
+    }
 
-        if (!token) {
-          throw new Error(
-            "CSRF cookie was not created by Django."
-          );
-        }
+    if (!csrfPromise) {
+        csrfPromise = axios.get(
+            `${api.defaults.baseURL}/csrf/`,
+            {
+                withCredentials: true,
+                timeout: API_CONFIG.TIMEOUT,
+                headers: {
+                    Accept: "application/json",
+                },
+            }
+        )
+        .then((response) => {
+            const token = response.data?.csrfToken;
 
-        return token;
-      })
-      .finally(() => {
-        csrfPromise = null;
-      });
-  }
+            if (!token) {
+                throw new Error(
+                    "Django did not return a CSRF token."
+                );
+            }
 
-  return csrfPromise;
+            csrfToken = token;
+
+            return token;
+        })
+        .catch((error) => {
+            csrfToken = null;
+
+            console.error(
+                "CSRF initialization failed:",
+                error.response?.data || error.message
+            );
+
+            throw error;
+        })
+        .finally(() => {
+            csrfPromise = null;
+        });
+    }
+
+    return csrfPromise;
 };
 
 // ============================================================
 // 4. Request interceptor
 // ============================================================
 
-const SAFE_METHODS = [
-  "get",
-  "head",
-  "options",
-  "trace",
-];
-
 api.interceptors.request.use(
-  async (config) => {
-    const method = (
-      config.method || "get"
-    ).toLowerCase();
+    async (config) => {
+        const method = (config.method || "get").toLowerCase();
 
-    if (!SAFE_METHODS.includes(method)) {
-      // Ensure CSRF cookie exists before unsafe requests.
-      const csrfToken = await ensureCsrfCookie();
+        if (!SAFE_METHODS.includes(method)) {
+            const token = await ensureCsrfCookie();
 
-      config.headers = config.headers || {};
+            config.headers = config.headers || {};
 
-      // Django expects this header for CSRF validation.
-      config.headers["X-CSRFToken"] = csrfToken;
-    }
+            config.headers["X-CSRFToken"] = token;
+        }
 
-    return config;
-  },
-  (error) => Promise.reject(error)
+        return config;
+    },
+    (error) => Promise.reject(error)
 );
+
 
 // ============================================================
 // 5. Refresh management
